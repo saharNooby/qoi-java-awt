@@ -16,6 +16,16 @@ import java.util.Objects;
  */
 class QOIUtilAWTTest {
 
+	private static final int[] BUFFERED_IMAGE_TYPES = new int[] {
+			BufferedImage.TYPE_INT_RGB,
+			BufferedImage.TYPE_INT_ARGB,
+			BufferedImage.TYPE_INT_ARGB_PRE,
+			BufferedImage.TYPE_INT_BGR,
+			BufferedImage.TYPE_3BYTE_BGR,
+			BufferedImage.TYPE_4BYTE_ABGR,
+			BufferedImage.TYPE_4BYTE_ABGR_PRE
+	};
+
 	@Test
 	void testOrange() throws Exception {
 		test("orange.png");
@@ -34,17 +44,7 @@ class QOIUtilAWTTest {
 		int width = source.getWidth();
 		int height = source.getHeight();
 
-		int[] types = {
-				BufferedImage.TYPE_INT_ARGB,
-				BufferedImage.TYPE_INT_ARGB_PRE,
-				BufferedImage.TYPE_3BYTE_BGR,
-				BufferedImage.TYPE_4BYTE_ABGR,
-				BufferedImage.TYPE_4BYTE_ABGR_PRE,
-				BufferedImage.TYPE_INT_BGR,
-				BufferedImage.TYPE_INT_RGB
-		};
-
-		for (int type : types) {
+		for (int type : BUFFERED_IMAGE_TYPES) {
 			BufferedImage copy = new BufferedImage(width, height, type);
 
 			{
@@ -54,6 +54,8 @@ class QOIUtilAWTTest {
 			}
 
 			QOIImage qoi = QOIUtilAWT.createFromBufferedImage(copy);
+
+			String message = "image type " + type + ", " + qoi.getChannels() + " channels";
 
 			// Check that pixel data is correct
 			for (int y = 0; y < height; y++) {
@@ -65,7 +67,7 @@ class QOIUtilAWTTest {
 					int b = qoi.getPixelData()[i + 2] & 0xFF;
 					int a = qoi.getChannels() == 4 ? qoi.getPixelData()[i + 3] & 0xFF : 0xFF;
 
-					Assertions.assertEquals(copy.getRGB(x, y), (a << 24) | (r << 16) | (g << 8) | b);
+					Assertions.assertEquals(copy.getRGB(x, y), (a << 24) | (r << 16) | (g << 8) | b, message);
 				}
 			}
 
@@ -74,7 +76,7 @@ class QOIUtilAWTTest {
 			// Check that image was not corrupted during encoding process
 			for (int y = 0; y < height; y++) {
 				for (int x = 0; x < width; x++) {
-					Assertions.assertEquals(copy.getRGB(x, y), convertedBack.getRGB(x, y));
+					Assertions.assertEquals(copy.getRGB(x, y), convertedBack.getRGB(x, y), message);
 				}
 			}
 		}
