@@ -7,8 +7,7 @@ import java.awt.image.*;
 import java.util.Hashtable;
 
 /**
- * @author saharNooby
- * @since 16:11 02.12.2021
+ * Contains public API methods of the library.
  */
 public final class QOIUtilAWT {
 
