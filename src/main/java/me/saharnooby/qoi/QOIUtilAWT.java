@@ -138,7 +138,6 @@ public final class QOIUtilAWT {
 
 		switch (image.getColorSpace()) {
 			case SRGB:
-			case SRGB_LINEAR_ALPHA:
 				awtColorSpace = java.awt.color.ColorSpace.getInstance(java.awt.color.ColorSpace.CS_sRGB);
 				break;
 			case LINEAR:
