@@ -117,7 +117,7 @@ public final class QOIImageWriter extends ImageWriter {
 				// todo should we here convert the pixel using the ColorModel?
 				raster.getPixel(x * sourceXSubsampling, y * sourceYSubsampling, pixel);
 
-				int i = index(x, y, width, bandCount);
+				int i = (y * width + x) * bandCount;
 
 				pixels[i] = (byte) pixel[0];
 				pixels[i + 1] = (byte) pixel[1];
@@ -166,72 +166,125 @@ public final class QOIImageWriter extends ImageWriter {
 		byte[] pixelData = new byte[width * height * channels];
 
 		switch (image.getType()) {
-			case BufferedImage.TYPE_INT_RGB:
 			case BufferedImage.TYPE_INT_ARGB: {
-				int[] pixel = new int[1];
+				assert channels == 4;
 
 				Raster raster = image.getRaster();
 
-				for (int y = 0; y < height; y++) {
-					for (int x = 0; x < width; x++) {
-						raster.getDataElements(x, y, pixel);
+				DataBufferInt buffer = (DataBufferInt) raster.getDataBuffer();
 
-						setRGB(pixelData, x, y, width, channels, pixel[0]);
-					}
+				int[] data = buffer.getData();
+
+				int total = width * height * 4;
+
+				for (int i = 0, j = buffer.getOffset(); i < total; i += 4, j++) {
+					int pixel = data[j];
+
+					pixelData[i] = (byte) (pixel >> 16);
+					pixelData[i + 1] = (byte) (pixel >> 8);
+					pixelData[i + 2] = (byte) pixel;
+					pixelData[i + 3] = (byte) (pixel >> 24);
+				}
+
+				break;
+			}
+			case BufferedImage.TYPE_INT_RGB: {
+				assert channels == 3;
+
+				Raster raster = image.getRaster();
+
+				DataBufferInt buffer = (DataBufferInt) raster.getDataBuffer();
+
+				int[] data = buffer.getData();
+
+				int total = width * height * 3;
+
+				for (int i = 0, j = buffer.getOffset(); i < total; i += 3, j++) {
+					int pixel = data[j];
+
+					pixelData[i] = (byte) (pixel >> 16);
+					pixelData[i + 1] = (byte) (pixel >> 8);
+					pixelData[i + 2] = (byte) pixel;
 				}
 
 				break;
 			}
 			case BufferedImage.TYPE_INT_BGR: {
-				int[] pixel = new int[1];
+				assert channels == 3;
 
 				Raster raster = image.getRaster();
 
-				for (int y = 0; y < height; y++) {
-					for (int x = 0; x < width; x++) {
-						raster.getDataElements(x, y, pixel);
+				DataBufferInt buffer = (DataBufferInt) raster.getDataBuffer();
 
-						setRGB(pixelData, x, y, width, channels, Integer.reverseBytes(pixel[0]) >> 8);
-					}
+				int[] data = buffer.getData();
+
+				int total = width * height * 3;
+
+				for (int i = 0, j = buffer.getOffset(); i < total; i += 3, j++) {
+					int pixel = data[j];
+
+					pixelData[i] = (byte) pixel;
+					pixelData[i + 1] = (byte) (pixel >> 8);
+					pixelData[i + 2] = (byte) (pixel >> 16);
 				}
 
 				break;
 			}
 			case BufferedImage.TYPE_3BYTE_BGR: {
-				byte[] pixel = new byte[3];
+				assert channels == 3;
 
 				Raster raster = image.getRaster();
 
-				for (int y = 0; y < height; y++) {
-					for (int x = 0; x < width; x++) {
-						raster.getDataElements(x, y, pixel);
+				DataBufferByte buffer = (DataBufferByte) raster.getDataBuffer();
 
-						int i = index(x, y, width, channels);
+				byte[] data = buffer.getData();
 
-						pixelData[i] = pixel[0];
-						pixelData[i + 1] = pixel[1];
-						pixelData[i + 2] = pixel[2];
-					}
+				int total = width * height * 3;
+
+				for (int i = 0, j = buffer.getOffset(); i < total; i += 3, j += 3) {
+					pixelData[i] = data[j + 2];
+					pixelData[i + 1] = data[j + 1];
+					pixelData[i + 2] = data[j];
 				}
 
 				break;
 			}
 			case BufferedImage.TYPE_4BYTE_ABGR: {
-				byte[] pixel = new byte[4];
+				assert channels == 4;
 
 				Raster raster = image.getRaster();
 
-				for (int y = 0; y < height; y++) {
-					for (int x = 0; x < width; x++) {
-						raster.getDataElements(x, y, pixel);
+				DataBufferByte buffer = (DataBufferByte) raster.getDataBuffer();
 
-						int i = index(x, y, width, channels);
+				byte[] data = buffer.getData();
 
-						pixelData[i] = pixel[0];
-						pixelData[i + 1] = pixel[1];
-						pixelData[i + 2] = pixel[2];
-						pixelData[i + 3] = pixel[3];
-					}
+				int total = width * height * 4;
+
+				for (int i = 0, j = buffer.getOffset(); i < total; i += 4, j += 4) {
+					pixelData[i] = data[j + 3];
+					pixelData[i + 1] = data[j + 2];
+					pixelData[i + 2] = data[j + 1];
+					pixelData[i + 3] = data[j];
+				}
+
+				break;
+			}
+			case BufferedImage.TYPE_BYTE_GRAY: {
+				assert channels == 3;
+
+				Raster raster = image.getRaster();
+
+				DataBufferByte buffer = (DataBufferByte) raster.getDataBuffer();
+
+				byte[] data = buffer.getData();
+
+				int total = width * height * 3;
+
+				for (int i = 0, j = buffer.getOffset(); i < total; i += 3, j++) {
+					byte value = data[j];
+					pixelData[i] = value;
+					pixelData[i + 1] = value;
+					pixelData[i + 2] = value;
 				}
 
 				break;
@@ -257,27 +310,21 @@ public final class QOIImageWriter extends ImageWriter {
 			for (int x = 0; x < width; x++) {
 				pixel = raster.getDataElements(x, y, pixel);
 
-				setRGB(pixelData, x, y, width, channels, colorModel.getRGB(pixel));
+				int rgb = colorModel.getRGB(pixel);
+
+				int i = (y * width + x) * channels;
+
+				pixelData[i] = (byte) (rgb >> 16);
+				pixelData[i + 1] = (byte) (rgb >> 8);
+				pixelData[i + 2] = (byte) rgb;
+
+				if (channels == 4) {
+					pixelData[i + 3] = (byte) (rgb >> 24);
+				}
 			}
 		}
 
 		return QOIUtil.createFromPixelData(pixelData, width, height, channels, QOIColorSpace.SRGB);
-	}
-
-	private static void setRGB(byte @NonNull [] pixelData, int x, int y, int width, int channels, int rgb) {
-		int i = index(x, y, width, channels);
-
-		pixelData[i] = (byte) (rgb >> 16);
-		pixelData[i + 1] = (byte) (rgb >> 8);
-		pixelData[i + 2] = (byte) rgb;
-
-		if (channels == 4) {
-			pixelData[i + 3] = (byte) (rgb >> 24);
-		}
-	}
-
-	private static int index(int x, int y, int width, int channels) {
-		return (y * width + x) * channels;
 	}
 
 	private static boolean isDefault(@NonNull ImageWriteParam param) {
