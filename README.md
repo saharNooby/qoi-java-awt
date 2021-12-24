@@ -1,6 +1,6 @@
 # qoi-java-awt
 
-This is `BufferedImage` support library for [qoi-java](https://github.com/saharNooby/qoi-java).
+This is `ImageIO` support library for [qoi-java](https://github.com/saharNooby/qoi-java) that allows working with QOI images as `BufferedImage`s.
 
 Documentation is in [the main repository](https://github.com/saharNooby/qoi-java).
 
