@@ -1,6 +1,7 @@
 package me.saharnooby.qoi;
 
 import lombok.NonNull;
+import me.saharnooby.qoi.util.TestUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -27,13 +28,8 @@ class QOIUtilAWTTest {
 	};
 
 	@Test
-	void testOrange() throws Exception {
-		test("orange.png");
-	}
-
-	@Test
-	void testOrangeCross() throws Exception {
-		test("orange-cross.png");
+	void testDice() throws Exception {
+		test("dice.png");
 	}
 
 	private void test(@NonNull String imageName) throws Exception {
@@ -74,11 +70,7 @@ class QOIUtilAWTTest {
 			BufferedImage convertedBack = QOIUtilAWT.convertToBufferedImage(qoi);
 
 			// Check that image was not corrupted during encoding process
-			for (int y = 0; y < height; y++) {
-				for (int x = 0; x < width; x++) {
-					Assertions.assertEquals(copy.getRGB(x, y), convertedBack.getRGB(x, y), message);
-				}
-			}
+			TestUtil.assertPixelsEqual(copy, convertedBack, message);
 		}
 	}
 
