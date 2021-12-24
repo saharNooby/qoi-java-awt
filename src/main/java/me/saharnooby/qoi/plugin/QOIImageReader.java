@@ -15,7 +15,6 @@ import javax.imageio.stream.ImageInputStream;
 import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.image.*;
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -43,10 +42,9 @@ public final class QOIImageReader extends ImageReader {
 
 		ImageInputStream input = (ImageInputStream) this.input;
 
-		// Buffering improves performance when reading from files.
-		// This assumes that no additional images are stored in a
-		// single QOI file, otherwise buffering will corrupt the stream.
-		this.image = QOIUtil.readImage(new BufferedInputStream(new WrappedImageInputStream(input)));
+		// This assumes that no additional data is stored in the
+		// stream, otherwise buffering will corrupt the stream.
+		this.image = QOIUtil.readImage(new WrappedImageInputStream(input));
 	}
 
 	private void checkIndex(int imageIndex) {
