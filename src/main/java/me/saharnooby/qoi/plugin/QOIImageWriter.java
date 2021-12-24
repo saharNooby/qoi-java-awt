@@ -5,7 +5,6 @@ import me.saharnooby.qoi.QOIColorSpace;
 import me.saharnooby.qoi.QOIImage;
 import me.saharnooby.qoi.QOIUtil;
 import me.saharnooby.qoi.QOIUtilAWT;
-import sun.awt.image.ByteInterleavedRaster;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageTypeSpecifier;
@@ -171,7 +170,7 @@ public final class QOIImageWriter extends ImageWriter {
 		{
 			WritableRaster raster = image.getRaster();
 
-			if (raster instanceof ByteInterleavedRaster &&
+			if (raster.getClass().getName().equals("sun.awt.image.ByteInterleavedRaster") &&
 					raster.getMinX() == 0 &&
 					raster.getMinY() == 0 &&
 					raster.getWidth() == width &&
@@ -179,7 +178,7 @@ public final class QOIImageWriter extends ImageWriter {
 				ColorModel colorModel = image.getColorModel();
 
 				if (!colorModel.isAlphaPremultiplied()) {
-					byte[] buffer = ((ByteInterleavedRaster) raster).getDataStorage();
+					byte[] buffer = ((DataBufferByte) raster.getDataBuffer()).getData();
 
 					SampleModel model = raster.getSampleModel();
 

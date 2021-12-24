@@ -4,11 +4,11 @@ import lombok.NonNull;
 import me.saharnooby.qoi.util.TestUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import sun.awt.image.ByteInterleavedRaster;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 import java.io.InputStream;
 import java.util.Objects;
 
@@ -49,17 +49,17 @@ class QOIUtilAWTTest {
 		QOIImage qoi = QOIUtilAWT.createFromRenderedImage(image);
 
 		// ...and back
-		BufferedImage converted2 = QOIUtilAWT.convertToBufferedImage(qoi);
+		BufferedImage converted = QOIUtilAWT.convertToBufferedImage(qoi);
 
 		// Check that data buffer stays the same after conversions
 		Assertions.assertSame(
-				((ByteInterleavedRaster) image.getRaster()).getDataStorage(),
+				((DataBufferByte) image.getRaster().getDataBuffer()).getData(),
 				qoi.getPixelData()
 		);
 
 		Assertions.assertSame(
-				((ByteInterleavedRaster) image.getRaster()).getDataStorage(),
-				((ByteInterleavedRaster) converted2.getRaster()).getDataStorage()
+				((DataBufferByte) image.getRaster().getDataBuffer()).getData(),
+				((DataBufferByte) converted.getRaster().getDataBuffer()).getData()
 		);
 	}
 
