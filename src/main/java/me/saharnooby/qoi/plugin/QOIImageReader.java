@@ -125,7 +125,7 @@ public final class QOIImageReader extends ImageReader {
 		BufferedImage source = convertToBufferedImage(this.image);
 
 		// Fast path
-		if (param == null || isDefault(param)) {
+		if (param == null || ImageParamUtil.isDefault(param)) {
 			processImageComplete();
 
 			return source;
@@ -287,20 +287,6 @@ public final class QOIImageReader extends ImageReader {
 		}
 
 		return awtColorSpace;
-	}
-
-	private static boolean isDefault(@NonNull ImageReadParam param) {
-		return param.getClass() == ImageReadParam.class &&
-				param.getSourceRegion() == null &&
-				param.getSourceXSubsampling() == 1 &&
-				param.getSourceYSubsampling() == 1 &&
-				param.getSubsamplingXOffset() == 0 &&
-				param.getSubsamplingYOffset() == 0 &&
-				param.getSourceBands() == null &&
-				param.getDestinationType() == null &&
-				param.getDestinationOffset().equals(new Point(0, 0)) &&
-				param.getDestination() == null &&
-				param.getDestinationBands() == null;
 	}
 
 }

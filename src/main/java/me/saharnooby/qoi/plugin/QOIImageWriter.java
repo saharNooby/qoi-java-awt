@@ -53,7 +53,7 @@ public final class QOIImageWriter extends ImageWriter {
 		RenderedImage rendered = image.getRenderedImage();
 
 		// Fast path
-		if (param == null || isDefault(param)) {
+		if (param == null || ImageParamUtil.isDefault(param)) {
 			writeImage(QOIUtilAWT.createFromRenderedImage(rendered));
 
 			return;
@@ -325,18 +325,6 @@ public final class QOIImageWriter extends ImageWriter {
 		}
 
 		return QOIUtil.createFromPixelData(pixelData, width, height, channels, QOIColorSpace.SRGB);
-	}
-
-	private static boolean isDefault(@NonNull ImageWriteParam param) {
-		return param.getClass() == ImageWriteParam.class &&
-				param.getSourceRegion() == null &&
-				param.getSourceXSubsampling() == 1 &&
-				param.getSourceYSubsampling() == 1 &&
-				param.getSubsamplingXOffset() == 0 &&
-				param.getSubsamplingYOffset() == 0 &&
-				param.getSourceBands() == null &&
-				param.getDestinationType() == null &&
-				param.getDestinationOffset().equals(new Point(0, 0));
 	}
 
 }
