@@ -4,6 +4,7 @@ import lombok.NonNull;
 import me.saharnooby.qoi.util.TestUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import sun.awt.image.ByteInterleavedRaster;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -30,6 +31,36 @@ class QOIUtilAWTTest {
 	@Test
 	void testDice() throws Exception {
 		test("dice.png");
+	}
+
+	@Test
+	void testDirectUseOfDataBuffer() {
+		// 4 channel image
+		testDirectUseOfDataBuffer(new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB));
+		// 3 channel image
+		testDirectUseOfDataBuffer(new BufferedImage(16, 16, BufferedImage.TYPE_INT_RGB));
+	}
+
+	private void testDirectUseOfDataBuffer(@NonNull BufferedImage initialImage) {
+		// Obtain a BufferedImage from QOIUtilAWT
+		BufferedImage image = QOIUtilAWT.convertToBufferedImage(QOIUtilAWT.createFromRenderedImage(initialImage));
+
+		// Convert into QOI...
+		QOIImage qoi = QOIUtilAWT.createFromRenderedImage(image);
+
+		// ...and back
+		BufferedImage converted2 = QOIUtilAWT.convertToBufferedImage(qoi);
+
+		// Check that data buffer stays the same after conversions
+		Assertions.assertSame(
+				((ByteInterleavedRaster) image.getRaster()).getDataStorage(),
+				qoi.getPixelData()
+		);
+
+		Assertions.assertSame(
+				((ByteInterleavedRaster) image.getRaster()).getDataStorage(),
+				((ByteInterleavedRaster) converted2.getRaster()).getDataStorage()
+		);
 	}
 
 	private void test(@NonNull String imageName) throws Exception {

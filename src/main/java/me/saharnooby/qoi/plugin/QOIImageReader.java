@@ -22,8 +22,8 @@ import java.util.Iterator;
 
 public final class QOIImageReader extends ImageReader {
 
-	private static final int[] OFFSETS_3 = {0, 1, 2};
-	private static final int[] OFFSETS_4 = {0, 1, 2, 3};
+	static final int[] OFFSETS_3 = {0, 1, 2};
+	static final int[] OFFSETS_4 = {0, 1, 2, 3};
 
 	private QOIImage image;
 
@@ -271,20 +271,14 @@ public final class QOIImageReader extends ImageReader {
 	}
 
 	private static ColorSpace getAwtColorSpace(@NonNull QOIColorSpace colorSpace) {
-		ColorSpace awtColorSpace;
-
 		switch (colorSpace) {
 			case SRGB:
-				awtColorSpace = ColorSpace.getInstance(ColorSpace.CS_sRGB);
-				break;
+				return ColorSpace.getInstance(ColorSpace.CS_sRGB);
 			case LINEAR:
-				awtColorSpace = ColorSpace.getInstance(ColorSpace.CS_LINEAR_RGB);
-				break;
+				return ColorSpace.getInstance(ColorSpace.CS_LINEAR_RGB);
 			default:
 				throw new RuntimeException();
 		}
-
-		return awtColorSpace;
 	}
 
 }

@@ -5,14 +5,19 @@ import me.saharnooby.qoi.QOIColorSpace;
 import me.saharnooby.qoi.QOIImage;
 import me.saharnooby.qoi.QOIUtil;
 import me.saharnooby.qoi.QOIUtilAWT;
+import sun.awt.image.ByteInterleavedRaster;
 
-import javax.imageio.*;
+import javax.imageio.IIOImage;
+import javax.imageio.ImageTypeSpecifier;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.spi.ImageWriterSpi;
 import javax.imageio.stream.ImageOutputStream;
 import java.awt.*;
 import java.awt.image.*;
 import java.io.IOException;
+import java.util.Arrays;
 
 public final class QOIImageWriter extends ImageWriter {
 
@@ -161,6 +166,50 @@ public final class QOIImageWriter extends ImageWriter {
 	private static QOIImage createFromBufferedImage(@NonNull BufferedImage image) {
 		int width = image.getWidth();
 		int height = image.getHeight();
+
+		// Try use data buffer directly, if possible
+		{
+			WritableRaster raster = image.getRaster();
+
+			if (raster instanceof ByteInterleavedRaster &&
+					raster.getMinX() == 0 &&
+					raster.getMinY() == 0 &&
+					raster.getWidth() == width &&
+					raster.getHeight() == height) {
+				ColorModel colorModel = image.getColorModel();
+
+				if (!colorModel.isAlphaPremultiplied()) {
+					byte[] buffer = ((ByteInterleavedRaster) raster).getDataStorage();
+
+					SampleModel model = raster.getSampleModel();
+
+					if (model instanceof PixelInterleavedSampleModel &&
+							model.getTransferType() == DataBuffer.TYPE_BYTE &&
+							model.getWidth() == width &&
+							model.getHeight() == height &&
+							model.getNumBands() == 3 &&
+							((PixelInterleavedSampleModel) model).getPixelStride() == 3 &&
+							((PixelInterleavedSampleModel) model).getScanlineStride() == 3 * width &&
+							Arrays.equals(((PixelInterleavedSampleModel) model).getBandOffsets(), QOIImageReader.OFFSETS_3) &&
+							buffer.length == width * height * 3) {
+						return QOIUtil.createFromPixelData(buffer, width, height, 3);
+					}
+
+					if (model instanceof PixelInterleavedSampleModel &&
+							model.getTransferType() == DataBuffer.TYPE_BYTE &&
+							model.getWidth() == width &&
+							model.getHeight() == height &&
+							model.getNumBands() == 4 &&
+							((PixelInterleavedSampleModel) model).getPixelStride() == 4 &&
+							((PixelInterleavedSampleModel) model).getScanlineStride() == 4 * width &&
+							Arrays.equals(((PixelInterleavedSampleModel) model).getBandOffsets(), QOIImageReader.OFFSETS_4) &&
+							buffer.length == width * height * 4) {
+						return QOIUtil.createFromPixelData(buffer, width, height, 4);
+					}
+				}
+			}
+		}
+
 		int channels = image.getTransparency() != Transparency.OPAQUE ? 4 : 3;
 
 		byte[] pixelData = new byte[width * height * channels];

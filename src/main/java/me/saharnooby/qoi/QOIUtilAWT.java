@@ -13,7 +13,7 @@ import java.awt.image.RenderedImage;
 public final class QOIUtilAWT {
 
 	/**
-	 * Converts a {@link RenderedImage} into a QOI image. Image data is copied.
+	 * Converts a {@link RenderedImage} into a QOI image. Image data may be copied.
 	 * @param image Source image.
 	 * @return Conversion result.
 	 */
@@ -22,7 +22,7 @@ public final class QOIUtilAWT {
 	}
 
 	/**
-	 * Converts a {@link BufferedImage} into a QOI image. Image data is copied.
+	 * Converts a {@link BufferedImage} into a QOI image. Image data may be copied.
 	 * @param image Source image.
 	 * @return Conversion result.
 	 */
