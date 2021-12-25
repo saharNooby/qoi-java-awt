@@ -8,6 +8,8 @@ import java.awt.*;
 
 final class ImageParamUtil {
 
+	private static final Point ZERO = new Point(0, 0);
+
 	static boolean isDefault(@NonNull ImageReadParam param) {
 		return param.getClass() == ImageReadParam.class &&
 				param.getSourceRegion() == null &&
@@ -17,7 +19,7 @@ final class ImageParamUtil {
 				param.getSubsamplingYOffset() == 0 &&
 				param.getSourceBands() == null &&
 				param.getDestinationType() == null &&
-				param.getDestinationOffset().equals(new Point(0, 0)) &&
+				param.getDestinationOffset().equals(ZERO) &&
 				param.getDestination() == null &&
 				param.getDestinationBands() == null;
 	}
@@ -31,7 +33,7 @@ final class ImageParamUtil {
 				param.getSubsamplingYOffset() == 0 &&
 				param.getSourceBands() == null &&
 				param.getDestinationType() == null &&
-				param.getDestinationOffset().equals(new Point(0, 0));
+				param.getDestinationOffset().equals(ZERO);
 	}
 
 }
