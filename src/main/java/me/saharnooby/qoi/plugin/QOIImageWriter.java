@@ -4,7 +4,6 @@ import lombok.NonNull;
 import me.saharnooby.qoi.QOIColorSpace;
 import me.saharnooby.qoi.QOIImage;
 import me.saharnooby.qoi.QOIUtil;
-import me.saharnooby.qoi.QOIUtilAWT;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageTypeSpecifier;
@@ -58,7 +57,7 @@ public final class QOIImageWriter extends ImageWriter {
 
 		// Fast path
 		if (param == null || ImageParamUtil.isDefault(param)) {
-			writeImage(QOIUtilAWT.createFromRenderedImage(rendered));
+			writeImage(createFromRenderedImage(rendered));
 
 			return;
 		}
