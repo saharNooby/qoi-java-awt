@@ -6,7 +6,7 @@ import javax.imageio.stream.ImageOutputStream;
 final class QOIPluginConstants {
 
 	static final String VENDOR_NAME = "saharNooby";
-	static final String VERSION = "1.2.0";
+	static final String VERSION = "1.2.1";
 	static final String[] NAMES = {"qoi", "QOI"};
 	static final String[] SUFFIXES = {"qoi"};
 	static final String[] MIME_TYPES = new String[0];
